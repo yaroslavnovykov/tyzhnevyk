@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+ 
+@layer base {
+  :root {
+    --background: rgba(64, 64, 64, 0.1);
+    --foreground: #171717;
+    --primary: #3730A3;
+    --primary-light: rgba(55, 48, 163, 0.8);
+    --primary-lighter: rgba(55, 48, 163, 0.5);
+    --primary-lightest: rgba(55, 48, 163, 0.1);
+    --muted: #404040;
+    --muted-foreground: rgba(23, 23, 23, 0.6);
+    --card: rgba(255, 255, 255, 0.15);
+    --card-foreground: #171717;
+    --border: rgba(255, 255, 255, 0.3);
+    --input: rgba(23, 23, 23, 0.1);
+    --destructive: #EF4444;
+    --destructive-foreground: #FFFFFF;
+  }
+ 
+  .dark {
+    --background: #171717;
+    --foreground: #EEF2FF;
+    --primary: #3730A3;
+    --primary-light: rgba(55, 48, 163, 0.8);
+    --primary-lighter: rgba(55, 48, 163, 0.5);
+    --primary-lightest: rgba(55, 48, 163, 0.15);
+    --muted: #262626;
+    --muted-foreground: rgba(238, 242, 255, 0.6);
+    --card: rgba(255, 255, 255, 0.15);
+    --card-foreground: #EEF2FF;
+    --border: rgba(255, 255, 255, 0.3);
+    --input: rgba(238, 242, 255, 0.1);
+    --destructive: #EF4444;
+    --destructive-foreground: #FFFFFF;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .noise {
+    position: relative;
+  }
+  
+  .noise::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15'/%3E%3C/svg%3E");
+    background-position: 50% 50%;
+    background-size: 200px;
+    background-repeat: repeat;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.15;
+  }
+}
+
+.glass-card {
+  @apply relative bg-card border border-border backdrop-blur-sm z-10;
+}
+
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
