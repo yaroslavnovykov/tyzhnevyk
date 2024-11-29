@@ -12,10 +12,7 @@ export default {
         foreground: "var(--foreground)",
         primary: {
           DEFAULT: "var(--primary)",
-          foreground: "var(--primary-foreground)",
-          light: "var(--primary-light)",
-          lighter: "var(--primary-lighter)",
-          lightest: "var(--primary-lightest)",
+          foreground: "#FFFFFF",
         },
         muted: {
           DEFAULT: "var(--muted)",
@@ -26,33 +23,24 @@ export default {
           foreground: "var(--card-foreground)",
         },
         border: "var(--border)",
-        input: "var(--input)",
         destructive: {
           DEFAULT: "var(--destructive)",
           foreground: "var(--destructive-foreground)",
         },
+        input: "var(--input)",
+        "input-focus": "var(--input-focus)",
+      },
+      keyframes: {
+        shake: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '25%': { transform: 'translateX(0.5rem)' },
+          '75%': { transform: 'translateX(-0.5rem)' },
+        },
+      },
+      animation: {
+        shake: 'shake 0.2s ease-in-out 0s 2',
       },
     },
   },
-  plugins: [require("daisyui")],
-  daisyui: {
-    themes: [
-      {
-        light: {
-          ...require("daisyui/src/theming/themes")["light"],
-          primary: "#3730A3",
-          "primary-content": "#FFFFFF",
-          neutral: "#171717",
-          "base-100": "rgba(64, 64, 64, 0.1)",
-        },
-        dark: {
-          ...require("daisyui/src/theming/themes")["dark"],
-          primary: "#3730A3",
-          "primary-content": "#FFFFFF",
-          neutral: "#EEF2FF",
-          "base-100": "#171717",
-        },
-      },
-    ],
-  },
+  plugins: [],
 }

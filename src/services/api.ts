@@ -1,5 +1,11 @@
-import { supabase, DEMO_PROVIDER } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import type { User, Service, Appointment, WorkingHours } from '@/types';
+
+// Demo provider for development
+export const DEMO_PROVIDER = {
+  id: '00000000-0000-0000-0000-000000000001',
+  phone: '+380501234567'
+};
 
 export const api = {
   // Demo provider
@@ -91,15 +97,6 @@ export const api = {
     return data;
   },
 
-  async deleteUser(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('users')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-  },
-
   // Services
   async getServices(): Promise<Service[]> {
     const { data, error } = await supabase
@@ -135,12 +132,35 @@ export const api = {
 
     return appointments.map(appointment => ({
       ...appointment,
-      startTime: new Date(appointment.start_time),
-      endTime: new Date(appointment.end_time),
-      service_name: appointment.service?.name || 'Невідома послуга',
-      service_price: appointment.service?.price || 0,
-      service_duration: appointment.service?.duration || 0,
-      client: appointment.client,
+      start_time: new Date(appointment.start_time),
+      end_time: new Date(appointment.end_time),
+      service_name: appointment.service?.name || 'Невідома послуга'
+    }));
+  },
+
+  async getUpcomingAppointments(userId: string): Promise<Appointment[]> {
+    const { data: appointments, error } = await supabase
+      .from('appointments')
+      .select(`
+        *,
+        service:services(
+          name,
+          price,
+          duration
+        )
+      `)
+      .eq('client_id', userId)
+      .in('status', ['pending', 'confirmed'])
+      .gt('start_time', new Date().toISOString())
+      .order('start_time');
+
+    if (error) throw error;
+
+    return appointments.map(appointment => ({
+      ...appointment,
+      start_time: new Date(appointment.start_time),
+      end_time: new Date(appointment.end_time),
+      service_name: appointment.service?.name || 'Невідома послуга'
     }));
   },
 
@@ -179,10 +199,10 @@ export const api = {
     if (error) throw error;
   },
 
-  async updateAppointmentStatus(id: string, status: 'confirmed' | 'cancelled'): Promise<void> {
+  async cancelAppointment(id: string): Promise<void> {
     const { error } = await supabase
       .from('appointments')
-      .update({ status })
+      .update({ status: 'cancelled' })
       .eq('id', id);
 
     if (error) throw error;

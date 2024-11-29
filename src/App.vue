@@ -11,11 +11,14 @@
 import { onMounted } from 'vue';
 import ThemeToggle from '@/components/ThemeToggle.vue';
 import { useThemeStore } from '@/stores/theme';
+import { useAuthStore } from '@/stores/auth';
 
 const themeStore = useThemeStore();
+const authStore = useAuthStore();
 
-onMounted(() => {
+onMounted(async () => {
   themeStore.init();
+  await authStore.init();
 });
 </script>
 

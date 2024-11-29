@@ -1,47 +1,46 @@
 <template>
-  <div class="min-h-screen bg-background noise flex items-center justify-center p-4">
-    <div class="max-w-[380px] w-full">
-      <div class="glass-card rounded-[32px] p-8">
-        <!-- Logo -->
-        <div class="flex justify-start mb-12">
-          <Logo @click="router.push('/provider/login')" class="cursor-pointer" />
-        </div>
-
-        <!-- Greeting -->
-        <div class="space-y-2">
-          <p class="font-['IBM_Plex_Serif'] font-extralight italic text-[40px] leading-[46px] text-foreground">Вітаю!</p>
-          <div class="flex items-center gap-2 mt-[12px]">
-            <p class="text-[40px] leading-[32px] text-foreground">Я</p>
-            <div v-if="provider?.photo_url" class="w-[64px] h-[40px] relative overflow-hidden mx-2">
-              <img
-                :src="provider.photo_url"
-                :alt="provider.name || ''"
-                class="absolute inset-0 w-full h-full object-cover rounded-full"
-              />
-            </div>
-            <p class="text-[40px] leading-[32px] text-primary">{{ provider?.name || 'Майстер' }}</p>
-          </div>
-          <p class="text-[40px] leading-[46px] text-foreground mt-[12px]">
-            {{ formatSpecializations(provider?.specializations) }}
-          </p>
-        </div>
-
-        <!-- Book Button -->
-        <button
-          @click="router.push('/phone')"
-          class="btn btn-primary btn-lg w-full rounded-full mt-14"
-        >
-          Записатись
-        </button>
-      </div>
+  <BaseLayout>
+    <!-- Logo -->
+    <div class="flex justify-start mb-12">
+      <Logo @click="router.push('/provider/login')" class="cursor-pointer" />
     </div>
-  </div>
+
+    <!-- Greeting -->
+    <div class="space-y-2">
+      <p class="font-['IBM_Plex_Serif'] font-extralight italic text-[40px] leading-[46px] text-foreground">Вітаю!</p>
+      <div class="flex items-center gap-2 mt-[12px]">
+        <p class="text-[40px] leading-[32px] text-foreground">Я</p>
+        <div v-if="provider?.photo_url" class="w-[64px] h-[40px] relative overflow-hidden mx-2">
+          <img
+            :src="provider.photo_url"
+            :alt="provider.name || ''"
+            class="absolute inset-0 w-full h-full object-cover rounded-full"
+          />
+        </div>
+        <p class="text-[40px] leading-[32px] text-primary">{{ provider?.name || 'Майстер' }}</p>
+      </div>
+      <p class="text-[40px] leading-[46px] text-foreground mt-[12px]">
+        {{ formatSpecializations(provider?.specializations) }}
+      </p>
+    </div>
+
+    <!-- Book Button -->
+    <Button
+      variant="primary"
+      @click="router.push('/phone')"
+      class="mt-14"
+    >
+      Записатись
+    </Button>
+  </BaseLayout>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import Logo from '@/components/Logo.vue';
+import Button from '@/components/Button.vue';
+import BaseLayout from '@/components/shared/BaseLayout.vue';
 import { api } from '@/services/api';
 import type { User } from '@/types';
 
