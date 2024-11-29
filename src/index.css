@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,200;1,200&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -41,6 +43,7 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: 'IBM Plex Sans', sans-serif;
   }
 }
 
@@ -72,6 +75,11 @@
 @layer components {
   .glass-card {
     @apply relative bg-card border border-border backdrop-blur-2xl rounded-xl z-10;
+  }
+
+  .heading {
+    font-family: 'IBM Plex Serif', serif;
+    @apply font-extralight italic text-[40px] leading-[46px] text-foreground;
   }
 }
 

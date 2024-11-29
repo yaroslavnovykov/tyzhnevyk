@@ -1,37 +1,45 @@
 <template>
   <BaseLayout>
-    <!-- Logo -->
-    <div class="flex justify-start mb-12">
-      <Logo @click="router.push('/provider/login')" class="cursor-pointer" />
-    </div>
-
-    <!-- Greeting -->
-    <div class="space-y-2">
-      <p class="font-['IBM_Plex_Serif'] font-extralight italic text-[40px] leading-[46px] text-foreground">Вітаю!</p>
-      <div class="flex items-center gap-2 mt-[12px]">
-        <p class="text-[40px] leading-[32px] text-foreground">Я</p>
-        <div v-if="provider?.photo_url" class="w-[64px] h-[40px] relative overflow-hidden mx-2">
-          <img
-            :src="provider.photo_url"
-            :alt="provider.name || ''"
-            class="absolute inset-0 w-full h-full object-cover rounded-full"
-          />
+    <div class="flex flex-col h-full">
+      <div class="flex-1 flex flex-col px-10 py-10">
+        <!-- Logo -->
+        <div>
+          <Logo @click="router.push('/provider/login')" class="cursor-pointer" />
         </div>
-        <p class="text-[40px] leading-[32px] text-primary">{{ provider?.name || 'Майстер' }}</p>
-      </div>
-      <p class="text-[40px] leading-[46px] text-foreground mt-[12px]">
-        {{ formatSpecializations(provider?.specializations) }}
-      </p>
-    </div>
 
-    <!-- Book Button -->
-    <Button
-      variant="primary"
-      @click="router.push('/phone')"
-      class="mt-14"
-    >
-      Записатись
-    </Button>
+        <div class="h-[32px]" />
+
+        <!-- Greeting -->
+        <div class="space-y-2 mt-6">
+          <p class="heading">Вітаю!</p>
+          <div class="flex items-center gap-2">
+            <p class="text-[40px] leading-[32px] text-foreground">Я</p>
+            <div v-if="provider?.photo_url" class="w-[64px] h-[40px] relative overflow-hidden mx-2">
+              <img
+                :src="provider.photo_url"
+                :alt="provider.name || ''"
+                class="absolute inset-0 w-full h-full object-cover rounded-full"
+              />
+            </div>
+            <p class="text-[40px] leading-[32px] text-primary">{{ provider?.name || 'Майстер' }}</p>
+          </div>
+          <p class="text-[40px] leading-[48px] text-foreground">
+            {{ formatSpecializations(provider?.specializations) }}
+          </p>
+        </div>
+
+        <div class="h-[36px]" />
+
+        <!-- Book Button -->
+        <Button
+          variant="primary"
+          @click="router.push('/phone')"
+          class="w-full mt-auto"
+        >
+          Записатись
+        </Button>
+      </div>
+    </div>
   </BaseLayout>
 </template>
 
@@ -70,13 +78,4 @@ onMounted(async () => {
 </script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,200;1,200&display=swap');
-
-.font-['IBM_Plex_Serif'] {
-  font-family: 'IBM Plex Serif', serif;
-}
-
-:root {
-  font-family: 'IBM Plex Sans', sans-serif;
-}
 </style>
