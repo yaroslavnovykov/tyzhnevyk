@@ -1,121 +1,103 @@
 <template>
   <BaseLayout>
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-2xl font-bold">Мої записи</h1>
-      <button
-        @click="router.push('/services')"
-        class="inline-flex items-center justify-center rounded-md text-sm font-medium h-9 w-9 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground"
-      >
-        <Plus class="h-4 w-4" />
-      </button>
-    </div>
+    <div class="flex flex-col h-full">
+      <BackButton @click="router.push('/services')" />
 
-    <div v-if="isLoading" class="flex items-center justify-center">
-      <Loader2 class="h-8 w-8 animate-spin text-primary" />
-    </div>
-
-    <div v-else-if="error" class="text-center">
-      <p class="text-destructive mb-4">{{ error }}</p>
-      <Button variant="primary" @click="fetchAppointments">
-        Спробувати знову
-      </Button>
-    </div>
-
-    <div v-else class="space-y-4">
-      <div
-        v-for="appointment in appointments"
-        :key="appointment.id"
-        class="bg-muted/30 rounded-lg p-4"
-      >
-        <div class="flex items-center justify-between mb-2">
-          <h3 class="font-medium">{{ appointment.service_name }}</h3>
-          <span :class="[
-            'text-xs px-2 py-1 rounded-full',
-            appointment.status === 'confirmed' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
-          ]">
-            {{ formatStatus(appointment.status) }}
-          </span>
-        </div>
-        <p class="text-sm text-muted-foreground">
-          {{ formatDateTime(appointment.startTime) }}
-        </p>
-        <div class="mt-4 flex justify-end gap-2">
-          <button
-            v-if="appointment.status === 'pending'"
-            @click="cancelAppointment(appointment.id)"
-            class="text-sm text-destructive hover:text-destructive/80"
-          >
-            Скасувати
-          </button>
-        </div>
+      <div class="w-full aspect-[2/1]">
+        <img src="@/assets/images/ser.svg" alt="Appointments" class="w-full h-full object-cover" />
       </div>
+
+      <div class="flex-1 flex flex-col px-10">
+        <div class="h-[24px]" />
+
+        <div class="text-center space-y-2">
+          <h2 class="heading">{{ appointments.length ? 'Мої записи' : 'Поки немає записів' }}</h2>
+          <p class="text-sm text-muted-foreground">
+            {{ appointments.length ? 'Ваші заплановані та минулі записи' : 'Оберіть послугу та запишіться на зручний час' }}
+          </p>
+        </div>
+
+        <div class="h-[32px]" />
+
+        <template v-if="appointments.length">
+          <!-- Appointments List -->
+          <div class="divide-y divide-border">
+            <!-- Loading State -->
+            <template v-if="isLoading">
+              <div v-for="n in 3" :key="n" class="py-4">
+                <SkeletonCard />
+              </div>
+            </template>
+
+            <!-- Loaded State -->
+            <template v-else>
+              <div 
+                v-for="appointment in appointments" 
+                :key="appointment.id"
+                class="py-4"
+              >
+                <AppointmentCard
+                  :appointment="appointment"
+                  @click="router.push(`/appointments/${appointment.id}`)"
+                />
+              </div>
+            </template>
+          </div>
+        </template>
+
+        <template v-else>
+          <div class="flex-1" />
+          <Button variant="primary" class="w-full mb-5" @click="router.push('/services')">
+            Обрати послугу
+          </Button>
+        </template>
+      </div>
+
+      <div class="h-[32px]" />
     </div>
   </BaseLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { Plus, Loader2 } from 'lucide-vue-next';
-import BaseLayout from '@/components/shared/BaseLayout.vue';
-import Button from '@/components/Button.vue';
-import { api } from '@/services/api';
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import { api } from '@/services/api';
 import type { Appointment } from '@/types';
+import BaseLayout from '@/components/shared/BaseLayout.vue';
+import BackButton from '@/components/ui/BackButton.vue';
+import AppointmentCard from '@/components/ui/AppointmentCard.vue';
+import Button from '@/components/Button.vue';
+import SkeletonCard from '@/components/ui/SkeletonCard.vue';
 
 const router = useRouter();
+const route = useRoute();
 const authStore = useAuthStore();
 const appointments = ref<Appointment[]>([]);
 const isLoading = ref(true);
-const error = ref('');
 
-function formatDateTime(date: Date): string {
-  return new Intl.DateTimeFormat('uk-UA', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    hour: 'numeric',
-    minute: 'numeric'
-  }).format(date);
-}
-
-function formatStatus(status: string): string {
-  const statuses: Record<string, string> = {
-    pending: 'Очікує',
-    confirmed: 'Підтверджено',
-    cancelled: 'Скасовано',
-    completed: 'Завершено'
-  };
-  return statuses[status] || status;
-}
-
-async function fetchAppointments() {
-  if (!authStore.user) {
-    error.value = 'Увійдіть, щоб переглянути записи';
-    return;
-  }
-
-  isLoading.value = true;
-  error.value = '';
+const fetchAppointments = async () => {
   try {
-    const data = await api.getAppointments(authStore.user.id);
-    appointments.value = data;
-  } catch (err) {
-    error.value = 'Не вдалося завантажити записи';
-    console.error('Failed to fetch appointments:', err);
+    const appointmentsData = await api.getAppointments(authStore.user!.id);
+    appointments.value = appointmentsData;
+  } catch (error) {
+    console.error('Failed to load appointments:', error);
   } finally {
     isLoading.value = false;
   }
-}
+};
 
-async function cancelAppointment(id: string) {
-  try {
-    await api.cancelAppointment(id);
-    await fetchAppointments();
-  } catch (err) {
-    console.error('Failed to cancel appointment:', err);
-  }
-}
-
+// Загружаем записи при монтировании
 onMounted(fetchAppointments);
+
+// Обновляем записи при изменении маршрута
+watch(
+  () => route.path,
+  () => {
+    if (route.name === 'appointments') {
+      fetchAppointments();
+    }
+  },
+  { immediate: true }
+);
 </script>

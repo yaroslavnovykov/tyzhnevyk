@@ -79,39 +79,86 @@ export const authService = {
         return api.getDemoProvider();
       }
 
-      const { user: authUser } = await verifyOTP(phone, code);
-      if (!authUser?.id) return null;
+      console.log('Verifying OTP for:', phone);
+      // First verify the OTP
+      const { user: authUser, session } = await verifyOTP(phone, code);
+      console.log('OTP verification result:', { authUser, session });
 
-      // Get or create user after successful verification
-      const { data: existingUser, error: fetchError } = await supabase
+      if (!authUser?.id || !session) {
+        console.error('Missing user ID or session after verification');
+        throw new Error('Помилка верифікації. Спробуйт ще раз.');
+      }
+
+      // Try to get existing user by auth ID first
+      console.log('Checking for existing user by auth ID:', authUser.id);
+      let { data: userByAuthId, error: authIdError } = await supabase
+        .from('users')
+        .select()
+        .eq('id', authUser.id)
+        .single();
+
+      if (!authIdError && userByAuthId) {
+        console.log('Found user by auth ID:', userByAuthId);
+        return userByAuthId;
+      }
+
+      // Then try by phone
+      console.log('Checking for existing user by phone:', phone);
+      const { data: userByPhone, error: phoneError } = await supabase
         .from('users')
         .select()
         .eq('phone', phone)
         .single();
 
-      if (fetchError && fetchError.code === 'PGRST116') {
-        // User doesn't exist, create new one
-        const { data: newUser, error: createError } = await supabase
-          .from('users')
-          .insert({
-            id: authUser.id,
-            phone,
-            role: 'client',
-            auto_confirm: false,
-          })
-          .select()
-          .single();
+      if (!phoneError && userByPhone) {
+        console.log('Found user by phone:', userByPhone);
+        // Update user's auth ID if it's different
+        if (userByPhone.id !== authUser.id) {
+          console.log('Updating user auth ID');
+          const { data: updatedUser, error: updateError } = await supabase
+            .from('users')
+            .update({ id: authUser.id })
+            .eq('phone', phone)
+            .select()
+            .single();
 
-        if (createError) throw createError;
-        return newUser;
-      } else if (fetchError) {
-        throw fetchError;
+          if (updateError) {
+            console.error('Error updating user auth ID:', updateError);
+            throw updateError;
+          }
+          return updatedUser;
+        }
+        return userByPhone;
       }
 
-      return existingUser;
+      // If no user exists, create a temporary one without a name
+      console.log('Creating temporary user with ID:', authUser.id);
+      const { data: newUser, error: createError } = await supabase
+        .from('users')
+        .insert({
+          id: authUser.id,
+          phone,
+          role: 'client',
+          auto_confirm: false,
+          name: null // Explicitly set name to null for new users
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('Error creating user:', createError);
+        throw createError;
+      }
+
+      console.log('Successfully created new user:', newUser);
+      return newUser;
     } catch (error) {
       console.error('OTP verification failed:', error);
-      throw error;
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        throw new Error('Помилка верифікації. Спробуйте ще раз.');
+      }
     }
   },
 

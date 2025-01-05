@@ -194,4 +194,4 @@ const clear = () => {
 .animate-shake {
   animation: shake 0.2s ease-in-out 0s 2;
 }
-</style> 
+</style>

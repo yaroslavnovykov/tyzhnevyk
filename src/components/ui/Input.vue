@@ -16,11 +16,13 @@
         :value="modelValue"
         :placeholder="placeholder"
         :class="[
-          'w-full bg-card/50 backdrop-blur-xl rounded-2xl px-4 h-[52px] text-base text-foreground placeholder:text-muted-foreground',
-          'border border-border/50 focus:border-primary/50',
-          'outline-none transition-colors',
+          'w-full bg-input backdrop-blur-2xl rounded-md px-4 h-[52px] text-base text-foreground placeholder:text-muted-foreground',
+          'border border-border/50',
+          'outline-none transition-all duration-200',
+          'hover:bg-input-focus',
+          'focus:bg-input-focus focus:border-primary/50 focus:ring-2 focus:ring-primary/20',
           'disabled:opacity-50 disabled:cursor-not-allowed',
-          error ? 'border-destructive/50 focus:border-destructive' : '',
+          error ? 'border-destructive/50 focus:border-destructive focus:ring-destructive/20 animate-shake' : '',
           $attrs.class
         ]"
         @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
@@ -71,4 +73,16 @@ const clear = () => {
   emit('update:modelValue', '');
   input.value?.focus();
 };
-</script> 
+</script>
+
+<style scoped>
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(4px); }
+  75% { transform: translateX(-4px); }
+}
+
+.animate-shake {
+  animation: shake 0.2s ease-in-out 0s 2;
+}
+</style> 

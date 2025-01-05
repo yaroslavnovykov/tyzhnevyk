@@ -58,6 +58,10 @@ export async function verifyOTP(phone: string, token: string) {
     throw error;
   }
 
+  if (!data.user?.id || !data.session) {
+    throw new Error('Помилка верифікації. Спробуйте ще раз.');
+  }
+
   return data;
 }
 

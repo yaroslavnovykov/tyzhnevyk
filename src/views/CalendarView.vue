@@ -1,171 +1,208 @@
 <template>
   <BaseLayout>
-    <div class="mb-6 flex items-center">
-      <button
-        class="mr-2 inline-flex items-center justify-center rounded-md text-sm font-medium h-9 w-9 hover:bg-accent hover:text-accent-foreground"
-        @click="router.push('/services')"
-      >
-        <ArrowLeft class="h-4 w-4" />
-      </button>
-      <h1 class="text-2xl font-bold">Оберіть час</h1>
-    </div>
+    <div class="flex flex-col h-full">
+      <BackButton @click="router.push('/services')" />
 
-    <!-- Calendar -->
-    <div class="mb-8 bg-muted/30 rounded-lg p-4">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="font-medium">
-          {{ formatMonth(selectedDate) }}
-        </h2>
-        <div class="flex gap-1">
-          <button
-            class="inline-flex items-center justify-center rounded-md text-sm font-medium h-9 w-9 hover:bg-accent hover:text-accent-foreground"
-            @click="previousMonth"
-          >
-            <ChevronLeft class="h-4 w-4" />
-          </button>
-          <button
-            class="inline-flex items-center justify-center rounded-md text-sm font-medium h-9 w-9 hover:bg-accent hover:text-accent-foreground"
-            @click="nextMonth"
-          >
-            <ChevronRight class="h-4 w-4" />
-          </button>
+      <div class="w-full aspect-[2/1]">
+        <img src="@/assets/images/ser.svg" alt="Calendar" class="w-full h-full object-cover illustration" />
+      </div>
+
+      <div class="flex-1 flex flex-col px-10">
+        <div class="h-[24px]" />
+
+        <div class="text-center space-y-2">
+          <h2 class="heading">Вибери дату та час</h2>
+          <p class="text-sm text-muted-foreground">
+            Можна подивитись мій розклад на найближчі два тижні
+          </p>
         </div>
-      </div>
 
-      <!-- Days Grid -->
-      <div class="grid grid-cols-7 gap-1 mb-4">
-        <div
-          v-for="day in daysOfWeek"
-          :key="day"
-          class="text-center text-sm text-muted-foreground"
-        >
-          {{ day }}
+        <div class="h-[32px]" />
+
+        <!-- Calendar -->
+        <div class="glass-card rounded-md overflow-hidden mb-5">
+          <!-- Dates Slider -->
+          <div class="bg-white/5 backdrop-blur-sm p-3 relative">
+            <!-- Left Scroll Indicator -->
+            <div 
+              class="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#0f172a]/50 via-[#0f172a]/20 to-transparent pointer-events-none z-10 transition-opacity duration-200"
+              :class="[showLeftGradient ? 'opacity-100' : 'opacity-0']"
+            ></div>
+            
+            <!-- Right Scroll Indicator -->
+            <div 
+              class="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#0f172a]/50 via-[#0f172a]/20 to-transparent pointer-events-none z-10 transition-opacity duration-200"
+              :class="[showRightGradient ? 'opacity-100' : 'opacity-0']"
+            ></div>
+
+            <div class="overflow-x-auto scrollbar-hide relative" @scroll="handleScroll">
+              <div class="inline-flex gap-2 px-0.5">
+                <div 
+                  v-for="date in availableDates" 
+                  :key="date.toISOString()"
+                  class="min-w-[40px]"
+                >
+                  <button
+                    type="button"
+                    class="w-full flex flex-col items-center gap-1 p-2 rounded-md transition-colors"
+                    :class="[
+                      isDateSelected(date) ? 'bg-primary text-primary-foreground' : 'hover:bg-white/5',
+                      !isDateAvailable(date) ? 'opacity-50 cursor-not-allowed' : ''
+                    ]"
+                    :disabled="!isDateAvailable(date)"
+                    @click="selectDate(date)"
+                  >
+                    <span class="text-xs text-muted-foreground">{{ formatWeekday(date) }}</span>
+                    <span class="text-base font-medium">{{ formatDay(date) }}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Time Slots -->
+          <div v-if="selectedDate && timeSlots.length > 0" class="p-3 space-y-4">
+            <div v-for="(group, label) in groupedTimeSlots" :key="label">
+              <div class="text-sm text-muted-foreground mb-2">{{ label }}</div>
+              <div class="grid grid-cols-3 gap-2">
+                <button
+                  v-for="slot in group"
+                  :key="slot"
+                  type="button"
+                  class="p-2 text-sm text-center rounded-md transition-colors"
+                  :class="[
+                    isTimeSelected(slot) ? 'bg-primary text-primary-foreground' : 'hover:bg-white/5'
+                  ]"
+                  @click="selectTime(slot)"
+                >
+                  {{ slot }}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-        <button
-          v-for="date in calendarDays"
-          :key="date.toISOString()"
-          :class="[
-            'inline-flex items-center justify-center rounded-md text-sm font-medium h-9 w-9',
-            isToday(date) ? 'bg-primary text-primary-foreground' : '',
-            isSameMonth(date, selectedDate) ? '' : 'text-muted-foreground opacity-50',
-            isSameDay(date, selectedDate) ? 'bg-primary-light text-primary-foreground' : '',
-          ]"
-          @click="selectDate(date)"
-        >
-          {{ date.getDate() }}
-        </button>
-      </div>
 
-      <!-- Time Slots -->
-      <div class="space-y-2">
-        <button
-          v-for="time in availableTimeSlots"
-          :key="time.toISOString()"
-          :class="[
-            'w-full text-left px-4 py-2 rounded-md hover:bg-accent hover:text-accent-foreground',
-            isSameTime(time, selectedTime) ? 'bg-primary text-primary-foreground' : '',
-          ]"
-          @click="selectTime(time)"
+        <Button
+          type="submit"
+          variant="primary"
+          :disabled="!selectedDate || !selectedTime"
+          class="w-full"
+          @click="handleSubmit"
         >
-          {{ formatTime(time) }}
-        </button>
+          Записатись
+        </Button>
       </div>
     </div>
-
-    <!-- Confirm Button -->
-    <Button
-      variant="primary"
-      :disabled="!selectedTime"
-      @click="confirmBooking"
-      class="w-full"
-    >
-      Підтвердити
-    </Button>
   </BaseLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { format } from 'date-fns';
+import { uk } from 'date-fns/locale';
 import BaseLayout from '@/components/shared/BaseLayout.vue';
 import Button from '@/components/Button.vue';
-import { useBookingStore } from '@/stores/booking';
-import {
-  startOfMonth,
-  endOfMonth,
-  startOfWeek,
-  endOfWeek,
-  eachDayOfInterval,
-  isSameMonth,
-  isSameDay,
-  addMonths,
-  subMonths,
-  isToday,
-  addMinutes,
-  setHours,
-  setMinutes
-} from 'date-fns';
+import BackButton from '@/components/ui/BackButton.vue';
 
 const router = useRouter();
-const bookingStore = useBookingStore();
-const selectedDate = ref(new Date());
-const selectedTime = ref<Date | null>(null);
+const availableDates = ref<Date[]>([]);
+const selectedDate = ref<Date | null>(null);
+const selectedTime = ref<string | null>(null);
+const timeSlots = ref<string[]>([]);
 
-const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'];
+const showLeftGradient = ref(false);
+const showRightGradient = ref(true);
 
-const calendarDays = computed(() => {
-  const start = startOfWeek(startOfMonth(selectedDate.value), { weekStartsOn: 1 });
-  const end = endOfWeek(endOfMonth(selectedDate.value), { weekStartsOn: 1 });
-  return eachDayOfInterval({ start, end });
+const handleScroll = (e: Event) => {
+  const target = e.target as HTMLElement;
+  showLeftGradient.value = target.scrollLeft > 0;
+  showRightGradient.value = target.scrollLeft < (target.scrollWidth - target.clientWidth);
+};
+
+const formatWeekday = (date: Date) => {
+  return format(date, 'EEE', { locale: uk });
+};
+
+const formatDay = (date: Date) => {
+  return format(date, 'dd');
+};
+
+const isDateSelected = (date: Date) => {
+  if (!selectedDate.value) return false;
+  return format(date, 'yyyy-MM-dd') === format(selectedDate.value, 'yyyy-MM-dd');
+};
+
+const isDateAvailable = (date: Date) => {
+  // Временно все даты доступны
+  return true;
+};
+
+const isTimeSelected = (time: string) => {
+  return selectedTime.value === time;
+};
+
+const groupedTimeSlots = computed(() => {
+  const groups: Record<string, string[]> = {
+    'Ранок': [],
+    'День': [],
+    'Вечір': []
+  };
+
+  timeSlots.value.forEach(time => {
+    const hour = parseInt(time.split(':')[0]);
+    if (hour < 12) {
+      groups['Ранок'].push(time);
+    } else if (hour < 17) {
+      groups['День'].push(time);
+    } else {
+      groups['Вечір'].push(time);
+    }
+  });
+
+  // Удаляем пустые группы
+  return Object.fromEntries(
+    Object.entries(groups).filter(([_, slots]) => slots.length > 0)
+  );
 });
 
-const availableTimeSlots = computed(() => {
-  const slots: Date[] = [];
-  let time = setMinutes(setHours(selectedDate.value, 9), 0); // Start at 9:00
-  const end = setMinutes(setHours(selectedDate.value, 18), 0); // End at 18:00
-
-  while (time <= end) {
-    slots.push(new Date(time));
-    time = addMinutes(time, 30);
-  }
-  return slots;
-});
-
-function formatMonth(date: Date): string {
-  return new Intl.DateTimeFormat('uk-UA', { month: 'long' }).format(date);
-}
-
-function formatTime(date: Date): string {
-  return new Intl.DateTimeFormat('uk-UA', { hour: 'numeric', minute: 'numeric' }).format(date);
-}
-
-function previousMonth() {
-  selectedDate.value = subMonths(selectedDate.value, 1);
-}
-
-function nextMonth() {
-  selectedDate.value = addMonths(selectedDate.value, 1);
-}
-
-function selectDate(date: Date) {
+const selectDate = (date: Date) => {
   selectedDate.value = date;
   selectedTime.value = null;
-}
+  
+  // Временные данные для тайм-слотов
+  timeSlots.value = [
+    '09:00', '09:30', '10:00',
+    '10:30', '11:00', '11:30',
+    '12:00', '12:30', '13:00',
+    '13:30', '14:00', '14:30',
+    '15:00', '15:30', '16:00',
+    '16:30',
+    '17:00', '17:30'
+  ];
+};
 
-function selectTime(time: Date) {
+const selectTime = (time: string) => {
   selectedTime.value = time;
-}
+};
 
-function isSameTime(date1: Date, date2: Date | null): boolean {
-  if (!date2) return false;
-  return date1.getHours() === date2.getHours() && 
-         date1.getMinutes() === date2.getMinutes();
-}
-
-function confirmBooking() {
-  if (!selectedTime.value) return;
-  bookingStore.setSelectedDateTime(selectedTime.value);
+const handleSubmit = () => {
+  if (!selectedDate.value || !selectedTime.value) return;
   router.push('/confirm');
-}
+};
+
+onMounted(() => {
+  // Временные данные для тестирования
+  availableDates.value = Array.from({ length: 14 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() + i);
+    return date;
+  });
+
+  // Автоматически выбираем первую доступную дату
+  const firstAvailableDate = availableDates.value.find(date => isDateAvailable(date));
+  if (firstAvailableDate) {
+    selectDate(firstAvailableDate);
+  }
+});
 </script>

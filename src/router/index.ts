@@ -5,6 +5,7 @@ import PhoneView from '@/views/auth/PhoneView.vue';
 import VerifyView from '@/views/auth/VerifyView.vue';
 import RegisterView from '@/views/auth/RegisterView.vue';
 import AppointmentsView from '@/views/AppointmentsView.vue';
+import AppointmentDetailsView from '@/views/AppointmentDetailsView.vue';
 import ServicesView from '@/views/ServicesView.vue';
 import CalendarView from '@/views/CalendarView.vue';
 import ConfirmView from '@/views/ConfirmView.vue';
@@ -63,13 +64,19 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
+      path: '/appointments/:id',
+      name: 'appointment-details',
+      component: AppointmentDetailsView,
+      meta: { requiresAuth: true }
+    },
+    {
       path: '/services',
       name: 'services',
       component: ServicesView,
       meta: { requiresAuth: true }
     },
     {
-      path: '/calendar/:serviceId',
+      path: '/calendar',
       name: 'calendar',
       component: CalendarView,
       meta: { requiresAuth: true }

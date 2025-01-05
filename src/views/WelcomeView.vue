@@ -16,7 +16,7 @@
             <p class="text-[40px] leading-[32px] text-foreground">Я</p>
             <div v-if="provider?.photo_url" class="w-[64px] h-[40px] relative overflow-hidden mx-2">
               <img
-                :src="provider.photo_url"
+                src="/dasha.png"
                 :alt="provider.name || ''"
                 class="absolute inset-0 w-full h-full object-cover rounded-full"
               />
@@ -75,7 +75,4 @@ onMounted(async () => {
     console.error('Failed to fetch provider:', err);
   }
 });
-</script>
-
-<style>
-</style>
+</script> 
