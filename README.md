@@ -1,67 +1,101 @@
-# Tyzhnevyk App
+# Tyzhnevyk
 
-## Стилевые соглашения
+Booking application for service providers with focus on beauty industry.
 
-### Типографика
+## Features
 
-#### Заголовки
-Все заголовки используют класс `.heading` со следующими характеристиками:
-- Шрифт: IBM Plex Serif
-- Начертание: Extra Light Italic
-- Размер: 40px
-- Высота строки: 46px
-- Цвет: text-foreground
+### Client Side
+- Phone number authentication with OTP
+- Service browsing and booking
+- Appointment management
+- Random illustrations system
+- Responsive mobile-first design
+- Bilingual support (🇺🇦 UA, 🇬🇧 EN)
 
-```html
-<h2 class="heading">Заголовок</h2>
+### Provider Side (In Development)
+- Service management through GUI
+- Client management
+- Appointment overview and management
+- Schedule management
+- Mobile-first approach with desktop support
+- Administrative functions
+- Analytics and reporting
+
+## Development Roadmap
+
+### Phase 1: Provider Side Enhancement ⚙️
+1. **Admin Panel Development**
+   - Service management GUI
+   - Flow configuration interface
+   - Client database management
+   - Schedule management interface
+
+2. **Mobile-First Implementation**
+   - Responsive layout system
+   - Touch-friendly interactions
+   - Desktop layout adaptation
+
+3. **Localization System**
+   - Browser language detection
+   - Ukrainian and English support
+   - Dynamic content translation
+   - RTL support preparation
+
+### Phase 2: System Enhancement 🔄
+1. **Flow Management**
+   - Visual flow builder
+   - Service configuration GUI
+   - Dynamic form builder
+   - Custom field management
+
+2. **Provider Features**
+   - Enhanced analytics
+   - Client communication tools
+   - Automated notifications
+   - Calendar integrations
+
+### Phase 3: Monetization Strategy 💰
+1. **Payment Integration**
+   - Client payment processing
+   - Provider subscription system
+   - Commission management
+   - Payment analytics
+
+2. **Pricing Models**
+   - Subscription tiers
+   - Commission-based model
+   - Feature-based pricing
+   - Trial system
+
+## Technical Stack
+
+- Vue 3 + TypeScript
+- Tailwind CSS
+- Vite
+- Node.js backend
+- PostgreSQL
+
+## Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
 ```
 
-#### Основной текст
-- Шрифт: IBM Plex Sans (задан на уровне body)
-- Поддерживаемые начертания: Regular (400), Medium (500), Semi Bold (600)
+## Contributing
 
-### Отступы
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
-#### Welcome Screen
-Уникальный паттерн отступов:
-- Контейнер: `px-10 py-10`
-- После лого: `h-[32px]`
-- Блок приветствия: `space-y-2 mt-6`
-- Перед кнопкой: `h-[36px]`
-- Кнопка: `mt-auto`
+## License
 
-#### Остальные экраны
-Стандартный паттерн отступов:
-- Иллюстрация: edge-to-edge с `aspect-[2/1]`
-- Контент: `px-10`
-- После иллюстрации: `h-[24px]`
-- Между текстом: `space-y-2`
-- Между блоками: `h-[32px]`
-- Между инпутом и кнопкой: `h-2`
-- Отступ кнопки: `mt-3`
-- Нижний отступ контейнера: `pb-10`
-
-### Кнопка "Назад"
-- Позиция: `absolute left-6 top-6`
-- Размер: `h-9 w-9`
-- Иконка: `h-4 w-4`
-
-## Шрифты
-Шрифты подключены через Google Fonts в `index.css`:
-```css
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,200;1,200&display=swap');
-```
-
-## Цветовая схема
-Определена в `index.css` через CSS переменные с поддержкой темной темы:
-- `--background`: Фон приложения
-- `--foreground`: Основной текст
-- `--primary`: Акцентный цвет
-- `--muted`: Приглушенный фон
-- `--muted-foreground`: Приглушенный текст
-- `--card`: Фон карточек
-- `--card-foreground`: Текст на карточках
-- `--border`: Цвет границ
-- `--destructive`: Цвет ошибок
-- `--input`: Фон инпутов
-- `--input-focus`: Фон инпутов при фокусе
+This project is licensed under the MIT License - see the LICENSE file for details.
